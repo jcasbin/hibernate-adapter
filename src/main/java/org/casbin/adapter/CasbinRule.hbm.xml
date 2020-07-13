@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.casbin.adapter">
+    <class name="CasbinRule" table="casbin_rule" schema="mass">
+        <id name="id" column="id" type="int" />
+        <property name="ptype" column="ptype" type="string" />
+        <property name="v0" column="v0" type="string" />
+        <property name="v1" column="v1" type="string" />
+        <property name="v2" column="v2" type="string" />
+        <property name="v3" column="v3" type="string" />
+        <property name="v4" column="v4" type="string" />
+        <property name="v5" column="v5" type="string" />
+    </class>
+</hibernate-mapping>
