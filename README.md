@@ -1,5 +1,12 @@
 # hibernate-adapter
 
+[![codebeat badge](https://codebeat.co/badges/4bd94027-fdd2-4b11-b894-89785bf542b3)](https://codebeat.co/projects/github-com-jcasbin-hibernate-adapter-master)
+[![Build Status](https://travis-ci.org/jcasbin/hibernate-adapter.svg?branch=master)](https://travis-ci.org/jcasbin/hibernate-adapter)
+[![Coverage Status](https://coveralls.io/repos/github/jcasbin/hibernate-adapter/badge.svg?branch=master)](https://coveralls.io/github/jcasbin/hibernate-adapter?branch=master)
+[![javadoc](https://javadoc.io/badge2/org.casbin/hibernate-adapter/javadoc.svg)](https://javadoc.io/doc/org.casbin/hibernate-adapter)
+[![Maven Central](https://img.shields.io/maven-central/v/org.casbin/hibernate-adapter.svg)](https://mvnrepository.com/artifact/org.casbin/hibernate-adapter/latest)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
+
 Load policy from Hibernate or save policy to it.
 
 ## Usage
