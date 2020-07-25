@@ -14,6 +14,24 @@ public class HibernateAdapterTest {
     private static final String PASSWORD = "TEST_casbin";
 
     @Test
+    public void initDataBase() {
+        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
+
+        Adapter adapter = new HibernateAdapter(DRIVER, URL, USERNAME, PASSWORD, true);
+
+        e.setAdapter(adapter);
+        e.savePolicy(); //clear table
+
+        e.addPolicy("admin", "domain2", "data2", "write");
+        e.addPolicy("admin", "domain2", "data2", "read");
+        e.addPolicy("admin", "domain1", "data1", "write");
+        e.addPolicy("admin", "domain1", "data1", "read");
+
+        e.addGroupingPolicy("bob", "admin", "domain1");
+        e.addGroupingPolicy("bob", "admin", "domain2");
+    }
+
+    @Test
     public void testLoadPolicy() {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
 
