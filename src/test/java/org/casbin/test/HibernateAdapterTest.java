@@ -3,6 +3,7 @@ package org.casbin.test;
 import org.casbin.adapter.HibernateAdapter;
 import org.casbin.jcasbin.main.Enforcer;
 import org.casbin.jcasbin.persist.Adapter;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +14,7 @@ public class HibernateAdapterTest {
     private static final String USERNAME = "casbin_test";
     private static final String PASSWORD = "TEST_casbin";
 
-    @Test
+    @Before
     public void initDataBase() {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
 
@@ -27,7 +28,7 @@ public class HibernateAdapterTest {
         e.addPolicy("admin", "domain1", "data1", "write");
         e.addPolicy("admin", "domain1", "data1", "read");
 
-        e.addGroupingPolicy("bob", "admin", "domain1");
+        e.addGroupingPolicy("alice", "admin", "domain1");
         e.addGroupingPolicy("bob", "admin", "domain2");
     }
 
