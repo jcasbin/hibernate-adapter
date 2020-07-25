@@ -120,6 +120,11 @@ public class HibernateAdapter implements Adapter {
         properties.setProperty("hibernate.connection.url", this.url);
         properties.setProperty("hibernate.connection.username", this.username);
         properties.setProperty("hibernate.connection.password", this.password);
+        if (this.driver.contains("mysql")) {
+            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect");
+        } else if (this.driver.contains("oracle")) {
+            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.Oracle9iDialect");
+        }
         configuration.setProperties(properties);
 
         configuration.addClass(CasbinRule.class);

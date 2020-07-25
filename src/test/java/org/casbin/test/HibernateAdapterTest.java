@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 public class HibernateAdapterTest {
     private static final String DRIVER = "com.mysql.jdbc.Driver";
     private static final String URL = "jdbc:mysql://localhost:3306/casbin";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "AWVabcdefg2326222";
+    private static final String USERNAME = "casbin_test";
+    private static final String PASSWORD = "TEST_casbin";
 
     @Test
     public void testLoadPolicy() {

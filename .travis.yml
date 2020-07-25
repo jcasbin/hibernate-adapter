@@ -21,3 +21,4 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE casbin;'
   - psql -c 'CREATE DATABASE casbin;' -U postgres
+  - psql -c "CREATE USER casbin_test WITH PASSWORD 'TEST_casbin';" -U postgres
