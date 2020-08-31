@@ -31,3 +31,4 @@ Currently supported databases:
 
     MySQL
     Oracle
+    SQL Server 2012

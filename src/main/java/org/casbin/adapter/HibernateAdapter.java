@@ -47,7 +47,18 @@ public class HibernateAdapter implements Adapter {
     private void createDatabase() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        session.createSQLQuery("CREATE DATABASE IF NOT EXISTS casbin").executeUpdate();
+        if (this.driver.contains("mysql")) {
+            session.createSQLQuery("CREATE DATABASE IF NOT EXISTS casbin").executeUpdate();
+            session.createSQLQuery("USE casbin").executeUpdate();
+        } else if (this.driver.contains("sqlserver")) {
+            session.createSQLQuery("IF NOT EXISTS (" +
+                    "SELECT * FROM sysdatabases WHERE name = 'casbin') CREATE DATABASE casbin ON PRIMARY " +
+                    "( NAME = N'casbin', FILENAME = N'C:\\Program Files\\Microsoft SQL Server\\MSSQL.1\\MSSQL\\DATA\\casbinDB.mdf' , SIZE = 3072KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB ) " +
+                    "LOG ON\n" +
+                    "( NAME = N'casbin_log', FILENAME = N'C:\\Program Files\\Microsoft SQL Server\\MSSQL.1\\MSSQL\\DATA\\casbinDB_log.ldf' , SIZE = 1024KB , MAXSIZE = 2048GB , FILEGROWTH = 10%) " +
+                    "COLLATE Chinese_PRC_CI_AS").executeUpdate();
+            session.createSQLQuery("USE casbin").executeUpdate();
+        }
         tx.commit();
         session.close();
     }
@@ -86,6 +97,19 @@ public class HibernateAdapter implements Adapter {
                     "execute immediate v_sql;" +
                     "END IF;" +
                     "end;").executeUpdate();
+        } else if (this.driver.contains("sqlserver")) {
+            session.createSQLQuery("if not exists (select * from sysobjects where id = object_id('casbin_rule')) " +
+                    "create table  casbin_rule (" +
+                    "   id int, " +
+                    "   ptype VARCHAR(100) , " +
+                    "   v0 VARCHAR(100), " +
+                    "   v1 VARCHAR(100), " +
+                    "   v2 VARCHAR(100), " +
+                    "   v3 VARCHAR(100), " +
+                    "   v4 VARCHAR(100), " +
+                    "   v5 VARCHAR(100), " +
+                    "   primary key (id) " +
+                    ")").executeUpdate();
         }
         tx.commit();
         session.close();
@@ -108,6 +132,8 @@ public class HibernateAdapter implements Adapter {
                     "execute immediate v_sql;" +
                     "END IF;" +
                     "end;").executeUpdate();
+        } else if (this.driver.contains("sqlserver")) {
+            session.createSQLQuery("if exists (select * from sysobjects where id = object_id('casbin_rule') drop table casbin_rule").executeUpdate();
         }
         tx.commit();
         session.close();
@@ -124,6 +150,8 @@ public class HibernateAdapter implements Adapter {
             properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect");
         } else if (this.driver.contains("oracle")) {
             properties.setProperty("hibernate.dialect", "org.hibernate.dialect.Oracle9iDialect");
+        } else if (this.driver.contains("sqlserver")) {
+            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServer2012Dialect");
         }
         configuration.setProperties(properties);
 
