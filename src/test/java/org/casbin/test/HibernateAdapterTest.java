@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 
 public class HibernateAdapterTest {
     private static final String DRIVER = "com.mysql.jdbc.Driver";
-    private static final String URL = "jdbc:mysql://localhost:3306/casbin";
-    private static final String USERNAME = "casbin_test";
-    private static final String PASSWORD = "TEST_casbin";
+    private static final String URL = "jdbc:mysql://172.18.0.1:3306/casbin";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "casbin_test";
 
     @Before
     public void initDataBase() {
@@ -96,3 +96,4 @@ public class HibernateAdapterTest {
         assertEquals(res, e.enforce(sub, dom, obj, act));
     }
 }
+
