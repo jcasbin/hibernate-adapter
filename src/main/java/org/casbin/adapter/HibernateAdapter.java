@@ -10,6 +10,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 public class HibernateAdapter implements Adapter {
@@ -20,22 +23,31 @@ public class HibernateAdapter implements Adapter {
     private int size = 0;
     private boolean dbSpecified;
     private SessionFactory factory;
+    private DataSource dataSource;
+    private String databaseProductName;
 
-    public HibernateAdapter(String driver, String url, String username, String password) {
+    public HibernateAdapter(String driver, String url, String username, String password) throws SQLException {
         this(driver, url, username, password, false);
     }
 
-    public HibernateAdapter(String driver, String url, String username, String password, boolean dbSpecified) {
+    public HibernateAdapter(DataSource dataSource) throws SQLException {
+        this.dataSource = dataSource;
+
+        open();
+    }
+
+    public HibernateAdapter(String driver, String url, String username, String password, boolean dbSpecified) throws SQLException {
         this.driver = driver;
         this.url = url;
         this.username = username;
         this.password = password;
         this.dbSpecified = dbSpecified;
 
+        setDatabaseProductName();
         open();
     }
 
-    private void open() {
+    private void open() throws SQLException {
         this.factory = initSessionFactory();
         if (!this.dbSpecified) {
             createDatabase();
@@ -47,10 +59,10 @@ public class HibernateAdapter implements Adapter {
     private void createDatabase() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.driver.contains("mysql")) {
+        if (this.databaseProductName.contains("MySQL")) {
             session.createSQLQuery("CREATE DATABASE IF NOT EXISTS casbin").executeUpdate();
             session.createSQLQuery("USE casbin").executeUpdate();
-        } else if (this.driver.contains("sqlserver")) {
+        } else if (this.databaseProductName.contains("SQLServer")) {
             session.createSQLQuery("IF NOT EXISTS (" +
                     "SELECT * FROM sysdatabases WHERE name = 'casbin') CREATE DATABASE casbin ON PRIMARY " +
                     "( NAME = N'casbin', FILENAME = N'C:\\Program Files\\Microsoft SQL Server\\MSSQL.1\\MSSQL\\DATA\\casbinDB.mdf' , SIZE = 3072KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB ) " +
@@ -66,7 +78,7 @@ public class HibernateAdapter implements Adapter {
     private void createTable() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.driver.contains("mysql")) {
+        if (this.databaseProductName.contains("MySQL")) {
             session.createSQLQuery("CREATE TABLE IF NOT EXISTS casbin_rule (" +
                     "id INT not NULL primary key," +
                     "ptype VARCHAR(100) not NULL," +
@@ -76,7 +88,7 @@ public class HibernateAdapter implements Adapter {
                     "v3 VARCHAR(100)," +
                     "v4 VARCHAR(100)," +
                     "v5 VARCHAR(100))").executeUpdate();
-        } else if (this.driver.contains("oracle")) {
+        } else if (this.databaseProductName.contains("Oracle")) {
             session.createSQLQuery("declare " +
                     "nCount NUMBER;" +
                     "v_sql LONG;" +
@@ -97,7 +109,7 @@ public class HibernateAdapter implements Adapter {
                     "execute immediate v_sql;" +
                     "END IF;" +
                     "end;").executeUpdate();
-        } else if (this.driver.contains("sqlserver")) {
+        } else if (this.databaseProductName.contains("SQLServer")) {
             session.createSQLQuery("if not exists (select * from sysobjects where id = object_id('casbin_rule')) " +
                     "create table  casbin_rule (" +
                     "   id int, " +
@@ -118,9 +130,9 @@ public class HibernateAdapter implements Adapter {
     private void dropTable() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.driver.contains("mysql")) {
+        if (this.databaseProductName.contains("MySQL")) {
             session.createSQLQuery("DROP TABLE IF EXISTS casbin_rule").executeUpdate();
-        } else if (this.driver.contains("oracle")) {
+        } else if (this.databaseProductName.contains("Oracle")) {
             session.createSQLQuery("declare " +
                     "nCount NUMBER;" +
                     "v_sql LONG;" +
@@ -132,26 +144,33 @@ public class HibernateAdapter implements Adapter {
                     "execute immediate v_sql;" +
                     "END IF;" +
                     "end;").executeUpdate();
-        } else if (this.driver.contains("sqlserver")) {
+        } else if (this.databaseProductName.contains("SQLServer")) {
             session.createSQLQuery("if exists (select * from sysobjects where id = object_id('casbin_rule') drop table casbin_rule").executeUpdate();
         }
         tx.commit();
         session.close();
     }
 
-    private SessionFactory initSessionFactory() {
+    private SessionFactory initSessionFactory() throws SQLException {
         Configuration configuration = new Configuration();
         Properties properties = new Properties();
-        properties.setProperty("hibernate.connection.driver_class", this.driver);
-        properties.setProperty("hibernate.connection.url", this.url);
-        properties.setProperty("hibernate.connection.username", this.username);
-        properties.setProperty("hibernate.connection.password", this.password);
-        if (this.driver.contains("mysql")) {
-            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect");
-        } else if (this.driver.contains("oracle")) {
-            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.Oracle9iDialect");
-        } else if (this.driver.contains("sqlserver")) {
-            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServer2012Dialect");
+        if (dataSource != null) {
+            properties.put("hibernate.connection.datasource", this.dataSource);
+            Connection conn = this.dataSource.getConnection();
+            this.databaseProductName = conn.getMetaData().getDatabaseProductName();
+            conn.close();
+        } else {
+            properties.setProperty("hibernate.connection.driver_class", this.driver);
+            properties.setProperty("hibernate.connection.url", this.url);
+            properties.setProperty("hibernate.connection.username", this.username);
+            properties.setProperty("hibernate.connection.password", this.password);
+            if (this.driver.contains("mysql")) {
+                properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect");
+            } else if (this.driver.contains("oracle")) {
+                properties.setProperty("hibernate.dialect", "org.hibernate.dialect.Oracle9iDialect");
+            } else if (this.driver.contains("sqlserver")) {
+                properties.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServer2012Dialect");
+            }
         }
         configuration.setProperties(properties);
 
@@ -327,6 +346,18 @@ public class HibernateAdapter implements Adapter {
         }
         tx.commit();
         session.close();
+    }
+
+    private void setDatabaseProductName() {
+        if (this.driver != null) {
+            if (this.driver.contains("mysql")) {
+                this.databaseProductName = "MySQL";
+            } else if (this.driver.contains("oracle")) {
+                this.databaseProductName = "Oracle";
+            } else if (this.driver.contains("sqlserver")) {
+                this.databaseProductName = "SQLServer";
+            }
+        }
     }
 
     public int getPolicySize() {
