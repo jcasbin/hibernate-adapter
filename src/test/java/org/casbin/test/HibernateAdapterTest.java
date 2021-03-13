@@ -1,10 +1,13 @@
 package org.casbin.test;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import org.casbin.adapter.HibernateAdapter;
 import org.casbin.jcasbin.main.Enforcer;
 import org.casbin.jcasbin.persist.Adapter;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +18,7 @@ public class HibernateAdapterTest {
     private static final String PASSWORD = "casbin_test";
 
     @Before
-    public void initDataBase() {
+    public void initDataBase() throws SQLException {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
 
         Adapter adapter = new HibernateAdapter(DRIVER, URL, USERNAME, PASSWORD, true);
@@ -33,7 +36,7 @@ public class HibernateAdapterTest {
     }
 
     @Test
-    public void testLoadPolicy() {
+    public void testLoadPolicy() throws SQLException {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
 
         Adapter adapter = new HibernateAdapter(DRIVER, URL, USERNAME, PASSWORD, true);
@@ -52,7 +55,31 @@ public class HibernateAdapterTest {
     }
 
     @Test
-    public void testSavePolicy() {
+    public void testLoadPolicyWithDataSource() throws SQLException {
+        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
+
+        MysqlDataSource dataSource = new MysqlDataSource();
+        dataSource.setURL(URL);
+        dataSource.setUser(USERNAME);
+        dataSource.setPassword(PASSWORD);
+
+        Adapter adapter = new HibernateAdapter(dataSource);
+
+        e.setAdapter(adapter);
+        e.loadPolicy();
+
+        testDomainEnforce(e, "alice", "domain1", "data1", "read", true);
+        testDomainEnforce(e, "alice", "domain1", "data1", "write", true);
+        testDomainEnforce(e, "alice", "domain1", "data2", "read", false);
+        testDomainEnforce(e, "alice", "domain1", "data2", "write", false);
+        testDomainEnforce(e, "bob", "domain2", "data1", "read", false);
+        testDomainEnforce(e, "bob", "domain2", "data1", "write", false);
+        testDomainEnforce(e, "bob", "domain2", "data2", "read", true);
+        testDomainEnforce(e, "bob", "domain2", "data2", "write", true);
+    }
+
+    @Test
+    public void testSavePolicy() throws SQLException {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
 
         Adapter adapter = new HibernateAdapter(DRIVER, URL, USERNAME, PASSWORD, true);
@@ -80,7 +107,7 @@ public class HibernateAdapterTest {
     }
 
     @Test
-    public void testRemovePolicy() {
+    public void testRemovePolicy() throws SQLException {
         Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf");
 
         Adapter adapter = new HibernateAdapter(DRIVER, URL, USERNAME, PASSWORD, true);
