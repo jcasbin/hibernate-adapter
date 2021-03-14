@@ -6,7 +6,7 @@
 
     <groupId>org.casbin</groupId>
     <artifactId>hibernate-adapter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>Hibernate Adapter for JCasbin</name>
     <description>Load policy from Hibernate or save policy to it</description>
