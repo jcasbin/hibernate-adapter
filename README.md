@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/jcasbin/hibernate-adapter/badge.svg?branch=master)](https://coveralls.io/github/jcasbin/hibernate-adapter?branch=master)
 [![javadoc](https://javadoc.io/badge2/org.casbin/hibernate-adapter/javadoc.svg)](https://javadoc.io/doc/org.casbin/hibernate-adapter)
 [![Maven Central](https://img.shields.io/maven-central/v/org.casbin/hibernate-adapter.svg)](https://mvnrepository.com/artifact/org.casbin/hibernate-adapter/latest)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
+[![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/S5UjpzGZjN)
 
 Load policy from Hibernate or save policy to it.
 
