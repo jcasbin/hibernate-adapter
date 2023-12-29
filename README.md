@@ -1,4 +1,4 @@
-# hibernate-adapter
+# Hibernate Adapter for jCasbin
 
 [![codebeat badge](https://codebeat.co/badges/4bd94027-fdd2-4b11-b894-89785bf542b3)](https://codebeat.co/projects/github-com-jcasbin-hibernate-adapter-master)
 [![GitHub Actions](https://github.com/jcasbin/hibernate-adapter/workflows/build/badge.svg)](https://github.com/jcasbin/hibernate-adapter/actions)
