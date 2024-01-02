@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 public class HibernateAdapterTest {
     private static final String DRIVER = "com.mysql.jdbc.Driver";
-    private static final String URL = "jdbc:mysql://172.18.0.1:3306/casbin";
+    private static final String URL = "jdbc:mysql://172.18.0.1:3306/casbin?serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "casbin_test";
 
