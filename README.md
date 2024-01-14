@@ -7,7 +7,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.casbin/hibernate-adapter.svg)](https://mvnrepository.com/artifact/org.casbin/hibernate-adapter/latest)
 [![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/S5UjpzGZjN)
 
-Load policy from Hibernate or save policy to it.
+Load policy from [Hibernate](https://hibernate.org/orm/) or save policy to it.
 
 ## Usage
 First, Introduce it in the pom.xml:
