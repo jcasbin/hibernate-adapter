@@ -7,31 +7,23 @@ import java.sql.SQLException;
 import org.casbin.adapter.HibernateAdapter;
 import org.casbin.jcasbin.main.Enforcer;
 import org.junit.Test;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.mariadb.jdbc.MariaDbDataSource;
 
 public class HibernateAdapterDatasourceTest {
 
-    private static final String DRIVER = "org.mariadb.jdbc.Driver";
     private static final String URL = "jdbc:mariadb://localhost:3306/casbin?serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "casbin_test";
-    private static HikariDataSource dataSource;
-    
 
     @Test
     public void testInitDBfromMariaDBDatasource() throws SQLException {
 
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(URL);
-        config.setUsername(USERNAME);
-        config.setPassword(PASSWORD);
-        config.setDriverClassName(DRIVER);
-        config.setMaximumPoolSize(5);
+        MariaDbDataSource mariaDbDataSource = new MariaDbDataSource();
+        mariaDbDataSource.setUrl(URL);
+        mariaDbDataSource.setUser(USERNAME);
+        mariaDbDataSource.setPassword(PASSWORD);
         
-        dataSource = new HikariDataSource(config);
-        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", new HibernateAdapter(dataSource));
+        Enforcer e = new Enforcer("examples/rbac_with_domains_model.conf", new HibernateAdapter(mariaDbDataSource));
 
         e.savePolicy(); //clear table
 
