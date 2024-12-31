@@ -1,7 +1,6 @@
 package org.casbin.adapter;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.casbin.constants.AdapterConstants;
 import org.casbin.jcasbin.model.Assertion;
 import org.casbin.jcasbin.model.Model;
 import org.casbin.jcasbin.persist.Adapter;
@@ -60,10 +59,10 @@ public class HibernateAdapter implements Adapter {
     private void createDatabase() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.databaseProductName.contains(AdapterConstants.MySQL.name()) || this.databaseProductName.contains(AdapterConstants.MariaDB.name())) {
+        if (isSupportedDatabase(this.databaseProductName, "MySQL", "MariaDB")) {
             session.createSQLQuery("CREATE DATABASE IF NOT EXISTS casbin").executeUpdate();
             session.createSQLQuery("USE casbin").executeUpdate();
-        } else if (this.databaseProductName.contains(AdapterConstants.SQLServer.name())) {
+        } else if (this.databaseProductName.contains("SQLServer")) {
             session.createSQLQuery("IF NOT EXISTS (" +
                     "SELECT * FROM sysdatabases WHERE name = 'casbin') CREATE DATABASE casbin ON PRIMARY " +
                     "( NAME = N'casbin', FILENAME = N'C:\\Program Files\\Microsoft SQL Server\\MSSQL.1\\MSSQL\\DATA\\casbinDB.mdf' , SIZE = 3072KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB ) " +
@@ -79,7 +78,7 @@ public class HibernateAdapter implements Adapter {
     private void createTable() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.databaseProductName.contains(AdapterConstants.MySQL.name()) || this.databaseProductName.contains(AdapterConstants.MariaDB.name())) {
+        if (isSupportedDatabase(this.databaseProductName, "MySQL", "MariaDB")) {
             session.createSQLQuery("CREATE TABLE IF NOT EXISTS casbin_rule (" +
                     "id INT not NULL primary key," +
                     "ptype VARCHAR(100) not NULL," +
@@ -89,7 +88,7 @@ public class HibernateAdapter implements Adapter {
                     "v3 VARCHAR(100)," +
                     "v4 VARCHAR(100)," +
                     "v5 VARCHAR(100))").executeUpdate();
-        } else if (this.databaseProductName.contains(AdapterConstants.Oracle.name())) {
+        } else if (this.databaseProductName.contains("Oracle")) {
             session.createSQLQuery("declare " +
                     "nCount NUMBER;" +
                     "v_sql LONG;" +
@@ -110,7 +109,7 @@ public class HibernateAdapter implements Adapter {
                     "execute immediate v_sql;" +
                     "END IF;" +
                     "end;").executeUpdate();
-        } else if (this.databaseProductName.contains(AdapterConstants.SQLServer.name())) {
+        } else if (this.databaseProductName.contains("SQLServer")) {
             session.createSQLQuery("if not exists (select * from sysobjects where id = object_id('casbin_rule')) " +
                     "create table  casbin_rule (" +
                     "   id int, " +
@@ -131,9 +130,9 @@ public class HibernateAdapter implements Adapter {
     private void dropTable() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.databaseProductName.contains(AdapterConstants.MySQL.name()) || this.databaseProductName.contains(AdapterConstants.MariaDB.name())) {
+        if (isSupportedDatabase(this.databaseProductName, "MySQL", "MariaDB")) {
             session.createSQLQuery("DROP TABLE IF EXISTS casbin_rule").executeUpdate();
-        } else if (this.databaseProductName.contains(AdapterConstants.Oracle.name())) {
+        } else if (this.databaseProductName.contains("Oracle")) {
             session.createSQLQuery("declare " +
                     "nCount NUMBER;" +
                     "v_sql LONG;" +
@@ -145,7 +144,7 @@ public class HibernateAdapter implements Adapter {
                     "execute immediate v_sql;" +
                     "END IF;" +
                     "end;").executeUpdate();
-        } else if (this.databaseProductName.contains(AdapterConstants.SQLServer.name())) {
+        } else if (this.databaseProductName.contains("SQLServer")) {
             session.createSQLQuery("if exists (select * from sysobjects where id = object_id('casbin_rule') drop table casbin_rule").executeUpdate();
         }
         tx.commit();
@@ -357,8 +356,14 @@ public class HibernateAdapter implements Adapter {
                 this.databaseProductName = "Oracle";
             } else if (this.driver.contains("sqlserver")) {
                 this.databaseProductName = "SQLServer";
+            } else if (this.driver.contains("mariadb")) {
+                this.databaseProductName = "MariaDB";
             }
         }
+    }
+
+    private boolean isSupportedDatabase(String databaseProductName, String... databaseTypes) {
+        return Arrays.asList(databaseTypes).stream().anyMatch(databaseProductName::contains);
     }
 
     public int getPolicySize() {
