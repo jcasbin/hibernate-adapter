@@ -17,7 +17,6 @@ public class HibernateAdapterDatasourceTest {
 
     @Test
     public void testInitDBfromMariaDBDatasource() throws SQLException {
-
         MariaDbDataSource mariaDbDataSource = new MariaDbDataSource();
         mariaDbDataSource.setUrl(URL);
         mariaDbDataSource.setUser(USERNAME);
