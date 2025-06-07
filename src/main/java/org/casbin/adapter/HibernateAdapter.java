@@ -59,7 +59,7 @@ public class HibernateAdapter implements Adapter {
     private void createDatabase() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.databaseProductName.contains("MySQL")) {
+        if (this.databaseProductName.contains("MySQL") || this.databaseProductName.contains("MariaDB")) {
             session.createSQLQuery("CREATE DATABASE IF NOT EXISTS casbin").executeUpdate();
             session.createSQLQuery("USE casbin").executeUpdate();
         } else if (this.databaseProductName.contains("SQLServer")) {
@@ -78,7 +78,7 @@ public class HibernateAdapter implements Adapter {
     private void createTable() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.databaseProductName.contains("MySQL")) {
+        if (this.databaseProductName.contains("MySQL") || this.databaseProductName.contains("MariaDB")) {
             session.createSQLQuery("CREATE TABLE IF NOT EXISTS casbin_rule (" +
                     "id INT not NULL primary key," +
                     "ptype VARCHAR(100) not NULL," +
@@ -130,7 +130,7 @@ public class HibernateAdapter implements Adapter {
     private void dropTable() {
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
-        if (this.databaseProductName.contains("MySQL")) {
+        if (this.databaseProductName.contains("MySQL") || this.databaseProductName.contains("MariaDB")) {
             session.createSQLQuery("DROP TABLE IF EXISTS casbin_rule").executeUpdate();
         } else if (this.databaseProductName.contains("Oracle")) {
             session.createSQLQuery("declare " +
@@ -356,6 +356,8 @@ public class HibernateAdapter implements Adapter {
                 this.databaseProductName = "Oracle";
             } else if (this.driver.contains("sqlserver")) {
                 this.databaseProductName = "SQLServer";
+            } else if (this.driver.contains("mariadb")) {
+                this.databaseProductName = "MariaDB";
             }
         }
     }
