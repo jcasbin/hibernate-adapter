@@ -255,11 +255,6 @@ public class HibernateAdapter implements Adapter {
                 line.getV4(),
                 line.getV5());
         session.createSQLQuery(sql).executeUpdate();
-        session.createSQLQuery("UPDATE casbin_rule SET v1 = null WHERE v1 = 'null'").executeUpdate();
-        session.createSQLQuery("UPDATE casbin_rule SET v2 = null WHERE v2 = 'null'").executeUpdate();
-        session.createSQLQuery("UPDATE casbin_rule SET v3 = null WHERE v3 = 'null'").executeUpdate();
-        session.createSQLQuery("UPDATE casbin_rule SET v4 = null WHERE v4 = 'null'").executeUpdate();
-        session.createSQLQuery("UPDATE casbin_rule SET v5 = null WHERE v5 = 'null'").executeUpdate();
     }
 
     private void deleteData(Session session, String ptype, List<String> rules) {
